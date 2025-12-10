@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio to Text Translator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --dark-bg: #0d0724;
+            --purple-light: #9471f4;
+            --purple-dark: #6a40e8;
+            --text-light: #e0e6f0;
+            --text-muted: #a0a4b8;
+            --accent-glow: rgba(148, 113, 244, 0.7); /* Lighter purple for glows */
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative; /* For background layers */
+        }
+
+        /* Galactic Background Layer 1: Distant Stars (subtle movement) */
+        .galaxy-bg-1 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -3;
+            animation: parallax-move 180s linear infinite;
+        }
+
+        /* Galactic Background Layer 2: Nebula (more distinct glow and movement) */
+        .galaxy-bg-2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -2;
+            animation: parallax-move-faster 120s linear infinite, glow-pulse 10s ease-in-out infinite alternate;
+        }
+
+        /* Generate multiple stars with JavaScript or manually add more divs as needed */
+        .star {
+            position: absolute;
+            background: radial-gradient(circle, #fff 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 5s linear infinite alternate;
+        }
+
+        @keyframes parallax-move {
+            0% { background-position: 0 0; }
+            100% { background-position: -5000px 2500px; }
+        }
+
+        @keyframes parallax-move-faster {
+            0% { background-position: 0 0; }
+            100% { background-position: -8000px 4000px; }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes glow-pulse {
+            0% { filter: blur(3px) brightness(1); }
+            100% { filter: blur(5px) brightness(1.2); }
+        }
+        
+        /* Dynamic Star Generation (JavaScript will handle the actual creation) */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none; /* Allows clicks to pass through */
+        }
+
+        /* Top Navigation Bar */
+        .header {
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            background: rgba(13, 7, 36, 0.7); /* Slightly transparent for background to show */
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-decoration: none;
+            text-shadow: 0 0 5px var(--purple-light);
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-right: 30px;
+            font-weight: 500;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-light);
+            text-shadow: 0 0 8px var(--purple-light);
+        }
+
+        .auth-buttons a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .auth-buttons a:last-child {
+            padding: 8px 18px;
+            background: linear-gradient(45deg, var(--purple-light), var(--purple-dark));
+            border-radius: 20px;
+            color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .auth-buttons a:last-child:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(106, 64, 232, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px); /* Adjust for header height */
+            text-align: center;
+            position: relative;
+            width: 100%;
+            flex-direction: column;
+            padding-top: 80px; /* Offset for fixed header */
+        }
+        
+        .hero-text {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .hero-title {
+            font-size: 4.5rem; /* Larger title */
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.1;
+            text-shadow: 0 0 20px var(--purple-light), 0 0 40px var(--purple-dark);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem; /* Slightly larger */
+            color: var(--text-muted);
+            margin-top: 20px;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* Your App's Form Container */
+        .app-container {
+            width: 90%;
+            max-width: 650px; /* Slightly wider */
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px); /* Stronger blur */
+            border-radius: 20px; /* More rounded */
+            padding: 40px; /* More padding */
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); /* Stronger shadow */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            z-index: 3;
+            margin-top: 60px; /* More separation from hero text */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .app-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .app-container h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8em;
+            color: var(--text-light);
+            text-shadow: 0 0 5px var(--purple-light);
+        }
+
+        .app-container p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5em;
+            font-weight: 300;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+          
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        input[type="file"], select {
+            width: 100%;
+            padding: 14px; /* More padding */
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            border-radius: 10px; /* More rounded */
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            
+        }
+
+        input[type="file"]:focus, select:focus {
+            outline: none;
+            border-color: var(--purple-light);
+            box-shadow: 0 0 15px var(--accent-glow); /* Stronger glow */
+        }
+
+        input[type="submit"] {
+            background: linear-gradient(45deg, var(--purple-light), var(--purple-dark));
+            color: white;
+            padding: 15px 40px; /* Larger button */
+            border: none;
+            border-radius: 30px; /* Pill shape */
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(106, 64, 232, 0.6); /* Enhanced hover shadow */
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px; /* More padding */
+            background-color: rgba(255, 255, 255, 0.08); /* Slightly darker */
+            border-radius: 10px;
+            border-left: 4px solid var(--purple-light);
+            text-align: left;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .result h3 {
+            color: var(--purple-light);
+            margin-top: 0;
+            font-weight: 500;
+            text-shadow: 0 0 5px rgba(148, 113, 244, 0.3);
+        }
+        .result strong {
+            color: var(--text-light);
+        }
+        .result em, .result small {
+            color: var(--text-muted);
+            font-style: normal;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 25px;
+            position: relative;
+            animation: pulse-text 2s infinite alternate;
+        }
+        @keyframes pulse-text {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-links, .auth-buttons {
+                margin-top: 10px;
+                width: 100%;
+                text-align: center;
+            }
+            .nav-links a, .auth-buttons a {
+                margin: 0 10px;
+            }
+            .hero-title {
+                font-size: 3rem;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            .app-container {
+                padding: 25px;
+            }
+            input[type="submit"] {
+                width: 100%;
+                padding: 12px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .header .logo {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .nav-links {
+                display: none; /* Hide for very small screens or make it a hamburger menu */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="galaxy-bg-1"></div>
+    <div class="galaxy-bg-2"></div>
+
+    <div class="stars-container" id="stars-container"></div>
+
+   
+    
+    <div class="hero">
+        <div class="hero-text">
+            <h1 class="hero-title">Audio to Text Translator</h1>
+            <p class="hero-subtitle">
+                Enter the future of seamless communication. Simplify audio translation, enhance your workflow,
+                and fortify your language learning experience.
+            </p>
+        </div>
+        
+        <div class="app-container">
+            <h1>Audio Translation App</h1>
+            <p>Upload an audio file to transcribe and translate it to your desired language.</p>
+            
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="form-group">
+                    <label for="file">Choose Audio File:</label>
+                    <input type="file" name="file" id="file" accept="audio/*" required>
+                    <small>Supported formats: MP3, WAV, M4A, FLAC, etc.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="language">Translate to:</label>
+                    <select name="language" id="language" required>
+                        <option value="">Select target language</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Korean">Korean</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Gujarati">Gujarati</option>
+                        <option value="Punjabi">Punjabi</option>
+                    </select>
+                </div>
+                
+                <input type="submit" value="Upload and Translate">
+            </form>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <p>Processing your audio file... This may take a few moments.</p>
+            </div>
+            
+            <div id="result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                } else if (data.transcript && data.translation) {
+                    resultDiv.innerHTML = `
+                        <h3>Results:</h3>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Original Text:</strong><br>
+                            <em>${data.transcript}</em>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Translation:</strong><br>
+                            <strong>${data.translation}</strong>
+                        </div>
+                        ${data.detected_language ? `<small>Detected language: ${data.detected_language}</small>` : ''}
+                    `;
+                } else if (data.message) {
+                    resultDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                } else {
+                    resultDiv.innerHTML = '<p style="color: red;">Unexpected response format.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Full error:', error);
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<p style="color: red;">Network error: ' + error.message + '</p>';
+            });
+        });
+
+        // JavaScript for dynamic star generation
+        function generateStars(numStars) {
+            const container = document.getElementById('stars-container');
+            for (let i = 0; i < numStars; i++) {
+                let star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = star.style.height = `${Math.random() * 3 + 1}px`; // 1 to 4px
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 5}s`; // Stagger twinkle
+                star.style.animationDuration = `${Math.random() * 3 + 3}s`; // 3 to 6s twinkle duration
+                container.appendChild(star);
+            }
+        }
+        generateStars(200); // Generate 200 stars
+
+        // Add background to the galaxy layers (can be images or more complex gradients)
+        // For a more dynamic feel, you can use subtle radial gradients or SVG patterns
+        document.querySelector('.galaxy-bg-1').style.backgroundImage = 'radial-gradient(circle at 15% 50%, rgba(148, 113, 244, 0.1) 0%, transparent 40%), radial-gradient(circle at 85% 20%, rgba(148, 113, 244, 0.08) 0%, transparent 50%), radial-gradient(circle at 40% 90%, rgba(148, 113, 244, 0.05) 0%, transparent 60%)';
+        document.querySelector('.galaxy-bg-2').style.backgroundImage = 'radial-gradient(circle at 70% 70%, rgba(148, 113, 244, 0.15) 0%, transparent 35%), radial-gradient(circle at 30% 10%, rgba(148, 113, 244, 0.1) 0%, transparent 45%)';
+
+    </script>
+</body>
+</html>
