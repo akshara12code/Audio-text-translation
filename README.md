@@ -10,7 +10,7 @@ This project provides an audio translation pipeline that:
 - Supports multiple language pairs
 
   <img width="1858" height="976" alt="Screenshot 2025-12-10 144154" src="https://github.com/user-attachments/assets/ad73aa97-374a-4803-b5c4-a500aac97221" />
-  <img width="1858" height="815" alt="Screenshot 2025-12-10 144220" src="https://github.com/user-attachments/assets/1427f75b-23e0-4950-b301-822531c5f856" />
+
   <img width="1103" height="962" alt="Screenshot 2025-12-10 144301" src="https://github.com/user-attachments/assets/1fcfe3b6-3acd-400a-b076-be05e40490b5" />
   <img width="1577" height="969" alt="image" src="https://github.com/user-attachments/assets/52e7c7e6-60a4-49df-8e85-5f1482a13153" />
 
