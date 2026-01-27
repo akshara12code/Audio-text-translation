@@ -97,4 +97,3 @@ python main.py
 
 On the first run, the model will be downloaded automatically (approximately 2-3 GB). This is a one-time process.
 
-## 🌐 Su
